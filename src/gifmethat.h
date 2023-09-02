@@ -11,6 +11,7 @@
 #define ERR_UNSUPPORTED_FEATURE 3
 
 #include <stdlib.h>
+#include <inttypes.h>
 
 // The valid GIF magic number, defined in gifmethat.c
 extern const uint8_t VALID_ID[3];
