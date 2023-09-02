@@ -18,6 +18,7 @@ int main(void) {
         return -1;
     printf("%" PRIu16 "x%" PRIu16 "\n", cats.width, cats.height);
     write_ppm("cats.ppm", &cats);
+    fclose(file);
 }
 
 
