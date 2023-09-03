@@ -50,7 +50,7 @@ int read_gif(int fd, Gif *gif) {
     gif->width = header.width;
     gif->height = header.height;
 
-    if (header.fields & (1 << 7) != 1 << 7) {
+    if ((header.fields & (1 << 7)) != (1 << 7)) {
         fprintf(stderr, "only gifs with gobal color tables are supported!");
         return ERR_UNSUPPORTED_FEATURE;
     }
@@ -76,14 +76,15 @@ int read_gif(int fd, Gif *gif) {
                 break;
             case BLOCK_TRAILER:
                 break;
-            case BLOCK_EXTENSION:
+            case BLOCK_EXTENSION: {
                 uint8_t ext_type;
                 read(fd, &ext_type, 1);
                 switch (ext_type) {
-                    case EXT_GRAPHIC_CONTROL:
+                    case EXT_GRAPHIC_CONTROL: {
                         // just skip it
                         uint8_t *buf = malloc(6);
                         read(fd, &buf, 6);
+			}
                         break;
                     default:
                         fprintf(stderr, "unknwon extension %" PRIu8 "!\n", ext_type);
@@ -95,6 +96,7 @@ int read_gif(int fd, Gif *gif) {
                 if (extension_data)
                     free(extension_data);
                 #endif
+		}
                 break;
             default:
                 fprintf(stderr, "unknown block type %" PRIu8 "\n", block_type);
@@ -116,7 +118,7 @@ int parse_image_descriptor(int fd, Gif *gif, Color *colors, size_t num_colors) {
     read(fd, &w, 2);
     read(fd, &h, 2);
     read(fd, &fields, 1);
-    if (fields & (1 << 6) == (1 << 6)) {
+    if ((fields & (1 << 6)) == (1 << 6)) {
         fprintf(stderr, "cannot parse interlaced gifs");
         return ERR_UNSUPPORTED_FEATURE;
     }
