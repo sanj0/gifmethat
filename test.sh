@@ -4,5 +4,7 @@
 
 set -xe
 
+mkdir -p target/test
+
 gcc -o target/test/main -lm src/gifmethat.c test/main.c
 ./target/test/main
