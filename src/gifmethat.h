@@ -9,14 +9,13 @@
 #define ERR_INVALID_GIF_ID      1
 #define ERR_INVALID_GIF_VERSION 2
 #define ERR_UNSUPPORTED_FEATURE 3
+#define ERR_MISSING_DATA        4
 
 #include <stdlib.h>
 #include <inttypes.h>
 
-// The valid GIF magic number, defined in gifmethat.c
-extern const uint8_t VALID_ID[3];
-// The valid version this library parses, defined in gifmethat.c
-extern const uint8_t VALID_VERSION[3];
+// The valid GIF magic number and version, defined in gifmethat.c
+extern const uint8_t VALID_ID_AND_VERSION[6];
 
 // A Color, defined by one byte red, green and blue each.
 typedef struct {
@@ -25,21 +24,18 @@ typedef struct {
     uint8_t blue;
 } Color;
 
-// The header of a GIF file according to the specification. This library only
-// uses width, height and some of the `fields` bits. `id` and `version` are
-// only parsed to check against the above declared constants. The rest is only
-// parsed for completion's sake and to properly advance the file cursor.
+// The header of a GIF file according to the specification.
+// This only contains fields the library uses to decode gifs.
+// All other fields a are omitted and simply skipped in `read_header`
+// to have this struct not be padded.
 typedef struct {
-    uint8_t id[3];
-    uint8_t version[3];
     uint16_t width;
     uint16_t height;
     uint8_t fields;
     uint8_t bg_index;
-    uint8_t pixel_aspect_ratio;
 } Header;
 
-// A decoded Gif. Consists of an array of `Color`s and a widht and height.
+// A decoded Gif. Consists of an array of `Color`s and a width and height.
 // Ideally, and always if the Gif was read by this library, the length of the
 // `pixels` array will be `width * height`.
 // The `pixels` array lists the pixels in the image from top left to bottom

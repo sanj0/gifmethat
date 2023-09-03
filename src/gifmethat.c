@@ -9,10 +9,9 @@
 
 // All the functions and constants are documented in the gifmethat.h file.
 
-const uint8_t VALID_ID[3] = { 71, 73, 70 };
-const uint8_t VALID_VERSION[3] = { 56, 57, 97 };
+const uint8_t VALID_ID_AND_VERSION[6] = "GIF89a";
 
-// and entry in the LZW dictionary
+// an entry in the LZW decompress dictionary
 typedef struct {
     uint8_t byte;
     int prev;
@@ -24,15 +23,21 @@ size_t read_sub_blocks(int fd, uint8_t **data);
 int uncompress(int code_len, uint8_t *input, int input_len, uint8_t *out);
 
 int read_header(int fd, Header *header) {
-    read(fd, header->id, 3);
-    read(fd, header->version, 3);
-    read(fd, &header->width, 2);
-    read(fd, &header->height, 2);
-    read(fd, &header->fields, 1);
-    read(fd, &header->bg_index, 1);
-    read(fd, &header->pixel_aspect_ratio, 1);
+    uint8_t id_and_version[6];
+    if (read(fd, id_and_version, 6) != 6)
+        return ERR_MISSING_DATA;
+    if (memcmp(VALID_ID_AND_VERSION, id_and_version, 3) != 0)
+        return ERR_INVALID_GIF_ID;
+    if (memcmp(VALID_ID_AND_VERSION + 3, id_and_version + 3, 3) != 0)
+        return ERR_INVALID_GIF_VERSION;
 
-    return 0;
+    if (read(fd, header, sizeof(Header)) != sizeof(Header)) {
+        return ERR_MISSING_DATA;
+    } else {
+        // skip the pixel aspect ratio
+        lseek(fd, 1, SEEK_CUR);
+        return 0;
+    }
 }
 
 int read_gif(int fd, Gif *gif) {
@@ -42,15 +47,6 @@ int read_gif(int fd, Gif *gif) {
         return err;
     }
 
-    if (memcmp(header.id, VALID_ID, 3)) {
-        fprintf(stderr, "that is not a gif!");
-        return ERR_INVALID_GIF_ID;
-    }
-
-    if (memcmp(header.version, VALID_VERSION, 3)) {
-        fprintf(stderr, "your gif is too old!");
-        return ERR_INVALID_GIF_VERSION;
-    }
     gif->width = header.width;
     gif->height = header.height;
 
