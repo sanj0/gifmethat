@@ -21,18 +21,3 @@ int main(void) {
     fclose(file);
 }
 
-
-void print_header(Header* h) {
-    printf("Header = {\n\tid: %c%c%c\n\tversion: %c%c%c\n\twidth: %" PRIu16 "\n\theight: %" PRIu16 "\n\tfield: %b\n\tbg_index: %" PRIu8 "\n\tpixel_aspect_ratio: %" PRIu8 "\n}\n",
-            (char) h->id[0],
-            (char) h->id[1],
-            (char) h->id[2],
-            (char) h->version[0],
-            (char) h->version[1],
-            (char) h->version[2],
-            h->width,
-            h->height,
-            h->fields,
-            h->bg_index,
-            h->pixel_aspect_ratio);
-}
